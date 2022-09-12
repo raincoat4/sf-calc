@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <random>
 #include <math.h>
+#include <string>
+#include <cstring>
 int success{0};
 int fail{0};
 int destroy{0};
@@ -83,8 +85,6 @@ int result(int stars) {
 	roll = ran1000();
 	//destroy
 	if (roll > (1000 - destroy)) {
-		std::cout << roll << "\n";
-		std::cout << 1000 - destroy << "\n";
 		return 3;
 	}
 	//success
@@ -99,7 +99,7 @@ int result(int stars) {
 }
 
 //for now ill just do 150 items(cra)
-int cost(int stars) {
+long long cost(int stars) {
 	if (stars < 10) {
 		temp = (pow(150, 3) * (stars + 1) / 2500 + 10);
 	}
@@ -121,35 +121,92 @@ int cost(int stars) {
 	return 100 * temp;
 
 }
+
+std::string makeCute(std::string cost) {
+	std::string newCost{};
+	int length = cost.length();
+	int returnLength = ((length - 1) / 3 + length);
+	switch (length % 3) {
+	case 0:
+		for (int i = 0; i < length; i++) {
+			if ((i) % 3 == 0 && i != 0) {
+				newCost.push_back(',');
+			}
+			newCost.push_back(cost[i]);
+		}
+		break;
+	case 1:
+		for (int i = 0; i < length; i++) {
+			if ((i + 2) % 3 == 0 && i != 0) {
+				newCost.push_back(',');
+			}
+			newCost.push_back(cost[i]);
+		}
+		break;
+	case 2:
+		for (int i = 0; i < length; i++) {
+			if ((i + 1) % 3 == 0 && i != 0) {
+				newCost.push_back(',');
+			}
+			newCost.push_back(cost[i]);
+		}
+	}
+	return newCost;
+}
+
+
 int main()
 {
 	int start{0};
 	int desired{0};
 	int tapresult{0};
 	int count{ 0 };
-	int mesoTotal{ 0 };
+	long long mesoTotal{ 0 };
+	double trials{ 0.0 };
+	long long mesoAverage{ 0 };
+	double split{ 0.0 };
+	int tempStart{ 0 };
+	double avgBooms{ 0.0 };
+	double booms{ 0.0 };
 	std::cout << "Enter starting stars: ";
 	std::cin >> start;
+	start = tempStart;
 	std::cout << "\n" << "Enter desired stars: ";
 	std::cin >> desired;
-	while (start != desired) {
-		tapresult = result(start);
-		count++;
-		mesoTotal += cost(start);
-		if (tapresult == 3) {
-			std::cout << "boomed";
-			break;
-		}
-		else if(tapresult == 1){
-			start++;
-			std::cout << "success, stars at " << start << "\n";
-		}
-		else if (tapresult == 2) {
-			if (start > 10 && start != 15 && start != 20) {
-				start--;
+	std::cout << "\n" << "Enter number of trials: ";
+	std::cin >> trials;
+	split = 1 / trials;
+	for (int i = 0; i < trials; i++) {
+		mesoTotal = 0;
+		start = tempStart;
+		while (start != desired) {
+			tapresult = result(start);
+			count++;
+			mesoTotal += cost(start);
+			if (tapresult == 3) {
+				booms++;
+				std::wcout << booms << "\n";
+				break;
 			}
-			std::cout << "failed, stars at " << start << "\n";
+			else if (tapresult == 1) {
+				start++;
+				//std::cout << "success, stars at " << start << "\n";
+			}
+			else if (tapresult == 2) {
+				if (start > 10 && start != 15 && start != 20) {
+					start--;
+				}
+				//std::cout << "failed, stars at " << start << "\n";
+				//10,791,789
+			}
+			std::cout << mesoTotal << "\n";
 		}
+		mesoAverage += mesoTotal * split; 
 	}
-	std::cout << "Total cost: " << mesoTotal;
+	avgBooms = booms / trials;
+	std::string mesoTotalString = makeCute(std::to_string(mesoAverage));
+	std::cout << "avg meso cost: " << mesoTotalString << "\n";
+	std::wcout << "avg booms: " << avgBooms << "\n";
+	
+	
 }
