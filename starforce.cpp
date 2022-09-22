@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <cstdlib>
 #include <random>
@@ -25,7 +24,7 @@ int ran1000() {
 int result(int stars) {
 	//2 -> 3 and 3 -> 4 have same success rate
 	if (stars == 3) {
-		stars == 2;
+		stars = 2;
 	}
 	//success will be if the roll is less than the success
 	success = 1000 - stars * 50;
@@ -99,7 +98,7 @@ int result(int stars) {
 }
 
 //for now ill just do 150 items(cra)
-long long cost(int stars) {
+long long cost(long long stars) {
 	if (stars < 10) {
 		temp = (pow(150, 3) * (stars + 1) / 2500 + 10);
 	}
@@ -157,17 +156,21 @@ std::string makeCute(std::string cost) {
 
 int main()
 {
-	int start{0};
+	long long start{0};
 	int desired{0};
 	int tapresult{0};
 	int count{ 0 };
 	long long mesoTotal{ 0 };
 	double trials{ 0.0 };
 	long long mesoAverage{ 0 };
-	double split{ 0.0 };
 	int tempStart{ 0 };
 	double avgBooms{ 0.0 };
 	double booms{ 0.0 };
+	int minBooms{0};
+	int maxBooms{0};
+	int totalBooms{0};
+	long long minMeso{0};
+	long long maxMeso{0};
 	std::cout << "Enter starting stars: ";
 	std::cin >> start;
 	start = tempStart;
@@ -175,7 +178,6 @@ int main()
 	std::cin >> desired;
 	std::cout << "\n" << "Enter number of trials: ";
 	std::cin >> trials;
-	split = 1 / trials;
 	for (int i = 0; i < trials; i++) {
 		mesoTotal = 0;
 		start = tempStart;
@@ -183,10 +185,10 @@ int main()
 			tapresult = result(start);
 			count++;
 			mesoTotal += cost(start);
+			//std::cout << "This is cost at " << start << "stars: " << makeCute(std::to_string(cost(start))) << "\n";
 			if (tapresult == 3) {
 				booms++;
-				std::wcout << booms << "\n";
-				break;
+				start = 12;
 			}
 			else if (tapresult == 1) {
 				start++;
@@ -199,11 +201,33 @@ int main()
 				//std::cout << "failed, stars at " << start << "\n";
 				//10,791,789
 			}
-			std::cout << mesoTotal << "\n";
 		}
-		mesoAverage += mesoTotal * split; 
+		totalBooms += booms;
+		mesoAverage += mesoTotal/trials; 
+		//setting min and max booms, booms can be 0 so no need to initialize booms to the first trial
+		if(minBooms >= booms){
+			minBooms = booms;
+		}
+		if(maxBooms <= booms){
+			maxBooms = booms;
+		}
+		//setting min and max meso
+		if(i == 0){
+			minMeso = mesoTotal;
+		}
+		else if(minMeso >= mesoTotal){
+			minMeso = mesoTotal;
+		}
+		if(maxMeso <= mesoTotal){
+			maxMeso = mesoTotal;
+		}
+		booms = 0;
+		mesoTotal = 0;
 	}
-	avgBooms = booms / trials;
+	std::cout << "no of booms: " << booms << "\n";
+	std::cout << "range of booms: " << minBooms << " -- " << maxBooms << "\n";
+	std::cout << "range of meso: " << makeCute(std::to_string(minMeso)) << " -- " << makeCute(std::to_string(maxMeso)) << "\n";
+	avgBooms = totalBooms / trials;
 	std::string mesoTotalString = makeCute(std::to_string(mesoAverage));
 	std::cout << "avg meso cost: " << mesoTotalString << "\n";
 	std::wcout << "avg booms: " << avgBooms << "\n";
